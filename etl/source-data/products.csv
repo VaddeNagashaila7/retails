@@ -1,0 +1,4 @@
+product_id,product_name,category,subcategory,unit_price
+P001,Laptop,Electronics,Computers,70000
+P002,Mobile,Electronics,Phones,30000
+P003,Headphones,Electronics,Audio,5000

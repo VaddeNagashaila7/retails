@@ -1,0 +1,4 @@
+customer_id,customer_name,gender,city,state,country
+C001,John Doe,Male,Bangalore,Karnataka,India
+C002,Jane Smith,Female,Mumbai,Maharashtra,India
+C003,Emily,Female,Delhi,Delhi,India

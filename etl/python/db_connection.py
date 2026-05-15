@@ -6,5 +6,5 @@ def get_connection():
         port=5432,
         database="retail_dw",
         user="postgres",
-        password="30036681"
+        password="your password"
     )

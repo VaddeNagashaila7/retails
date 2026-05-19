@@ -1,36 +1,61 @@
-import csv
-from .db_connection import get_connection
 
-conn = get_connection()
-cur = conn.cursor()
+from .base_loader import BaseLoader
 
-with open('etl/source-data/products.csv', 'r') as f:
-    reader = csv.DictReader(f)
+class DimProductLoader(BaseLoader):
 
-    for row in reader:
-        key = (
-            row['product_name'],
-            row['category'],
-            row['subcategory'],
-            float(row['unit_price'])
-        )
+    def __init__(self):
+        super().__init__('etl/source-data/products.csv')
 
-        cur.execute("""
-            SELECT 1 FROM dim_product
-            WHERE product_name=%s AND category=%s AND subcategory=%s AND unit_price=%s
-        """, key)
+    def load(self):
+        data = self.read_csv()
 
-        if not cur.fetchone():
-            cur.execute("""
-                INSERT INTO dim_product(product_name, category, subcategory, unit_price)
-                VALUES (%s, %s, %s, %s)
-            """, key)
+        for row in data:
+            key = (
+                row['product_name'],
+                row['category'],
+                row['subcategory'],
+                float(row['unit_price'])
+            )
 
-conn.commit()
-cur.close()
-conn.close()
+            exists_query = """
+                SELECT 1 FROM dim_product
+                WHERE product_name=%s AND category=%s AND subcategory=%s AND unit_price=%s
+            """
 
-print("dim_product loaded")
+            if not self.record_exists(exists_query, key):
+                insert_query = """
+                    INSERT INTO dim_product
+                    (product_name, category, subcategory, unit_price)
+                    VALUES (%s, %s, %s, %s)
+                """
+                self.insert_record(insert_query, key)
+
+        self.close()
+
+
+if __name__ == "__main__":
+    loader = DimProductLoader()
+    loader.load()
+    print("dim_product loaded")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -60,24 +85,49 @@ print("dim_product loaded")
 
 # with open('etl/source-data/products.csv', 'r') as f:
 #     reader = csv.DictReader(f)
+
 #     for row in reader:
-#         cur.execute(
-#             """
-#             INSERT INTO dim_product
-#             (product_name, category, subcategory, unit_price)
-#             VALUES (%s,%s,%s,%s)
-#             """,
-#             (
-#                 row['product_name'],
-#                 row['category'],
-#                 row['subcategory'],
-#                 row['unit_price']
-#             )
+#         key = (
+#             row['product_name'],
+#             row['category'],
+#             row['subcategory'],
+#             float(row['unit_price'])
 #         )
+
+#         cur.execute("""
+#             SELECT 1 FROM dim_product
+#             WHERE product_name=%s AND category=%s AND subcategory=%s AND unit_price=%s
+#         """, key)
+
+#         if not cur.fetchone():
+#             cur.execute("""
+#                 INSERT INTO dim_product(product_name, category, subcategory, unit_price)
+#                 VALUES (%s, %s, %s, %s)
+#             """, key)
 
 # conn.commit()
 # cur.close()
 # conn.close()
 
-# print("✅ dim_product loaded")
+# print("dim_product loaded")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
